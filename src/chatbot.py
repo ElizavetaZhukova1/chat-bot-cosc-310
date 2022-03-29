@@ -19,6 +19,7 @@ from data_importer import load_intents, load_entities
 from NER_func import find_NER
 from spellchecker import SpellChecker
 from translator import Translator
+from wiki import Wiki
 
 # 5 versions of apologies in case the bot cannot identify user's request and therefore cannot reply
 APOLOGIES = ["Sorry, I do not understand you. Please, try rephrasing the question using synonyms or simpler words",
@@ -82,7 +83,8 @@ class Chat:
         '''
         Predict the class (intent) of a users' sentence
         '''
-        translated=Translator(sentence)
+        translated = Translator(sentence)
+        term_def = Wiki(sentence)
         sentence = self.spellchecker.autocorrect(sentence)
         if (translated.get_ulang() != "en"):
             sentence = translated.utrans_text()
@@ -95,16 +97,17 @@ class Chat:
         return_list = []
         for r in results:
             return_list.append({'intent': self.classes[r[0]], 'probability': str(r[1])})
-        return return_list, translated
+        return return_list, translated, term_def
 
-    def get_response(self, intents_list, intents_json, ents, translated):
+    def get_response(self, intents_list, intents_json, ents, translated, term_def):
         '''
         Generate a response of the bot, given the probable intents of a users and the list of all intents
         '''
 
         if not intents_list:
-            result=random.choice(APOLOGIES)
+            result = random.choice(APOLOGIES)
         tag = intents_list[0]['intent']
+        print(tag)
 
         if tag in ["opening hours", "more information", "location info", "contact info"]:
             ent_matches = []
@@ -140,6 +143,8 @@ class Chat:
                 else:
                     info = self.entity_infos[entity]["contact"]
                     result = f"You can reach out to the {entity} here: {info}"
+        elif tag == "Definition":
+            result = "Let's see Wikipedia definition: \n\n" + term_def.get_short_summary()
         else:
             list_of_intents = intents_json['intents']
             for i in list_of_intents:
@@ -147,8 +152,8 @@ class Chat:
                     result = random.choice(i['responses'])
                     break
         if (translated.get_ulang() != "en"):
-            trans_resp=translated.trans_resp(result)
-            result = "It looks like you are using a foreign language. I will do my best to accommodate you!\n\n"+result+"\n\n"+trans_resp
+            trans_resp = translated.trans_resp(result)
+            result = "It looks like you are using a foreign language. I will do my best to accommodate you!\n\n" + result + "\n\n" + trans_resp
         return result
 
 
@@ -161,10 +166,10 @@ if __name__ == '__main__':
         message = input("")
         if message.lower() == 'stop':
             break
-        ints, trans = chat.predict_class(message)
+        ints, trans, defs = chat.predict_class(message)
         ents = find_NER(message)
         # add nouns found in the sentence
         # nouns = findNN(message)
         # ents.extend(nouns)
-        res = chat.get_response(ints, intents, ents, trans)
+        res = chat.get_response(ints, intents, ents, trans, defs)
         print(res)
