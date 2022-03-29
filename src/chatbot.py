@@ -18,6 +18,7 @@ from data_importer import load_intents, load_entities
 
 from NER_func import find_NER
 from spellchecker import SpellChecker
+from translator import Translator
 
 # 5 versions of apologies in case the bot cannot identify user's request and therefore cannot reply
 APOLOGIES = ["Sorry, I do not understand you. Please, try rephrasing the question using synonyms or simpler words",
@@ -81,9 +82,10 @@ class Chat:
         '''
         Predict the class (intent) of a users' sentence
         '''
-
+        translated=Translator(sentence)
         sentence = self.spellchecker.autocorrect(sentence)
-
+        if (translated.get_ulang() != "en"):
+            sentence = translated.utrans_text()
         bow = self.bag_words(sentence)
         res = self.chat_model.predict(bow)[0]
         err_border = 0.3
@@ -93,14 +95,15 @@ class Chat:
         return_list = []
         for r in results:
             return_list.append({'intent': self.classes[r[0]], 'probability': str(r[1])})
-        return return_list
+        return return_list, translated
 
-    def get_response(self, intents_list, intents_json, ents):
+    def get_response(self, intents_list, intents_json, ents, translated):
         '''
         Generate a response of the bot, given the probable intents of a users and the list of all intents
         '''
+
         if not intents_list:
-            return random.choice(APOLOGIES)
+            result=random.choice(APOLOGIES)
         tag = intents_list[0]['intent']
 
         if tag in ["opening hours", "more information", "location info", "contact info"]:
@@ -143,6 +146,9 @@ class Chat:
                 if i['tag'] == tag:
                     result = random.choice(i['responses'])
                     break
+        if (translated.get_ulang() != "en"):
+            trans_resp=translated.trans_resp(result)
+            result = "It looks like you are using a foreign language. I will do my best to accommodate you!\n\n"+result+"\n\n"+trans_resp
         return result
 
 
@@ -155,10 +161,10 @@ if __name__ == '__main__':
         message = input("")
         if message.lower() == 'stop':
             break
-        ints = chat.predict_class(message)
+        ints, trans = chat.predict_class(message)
         ents = find_NER(message)
         # add nouns found in the sentence
         # nouns = findNN(message)
         # ents.extend(nouns)
-        res = chat.get_response(ints, intents, ents)
+        res = chat.get_response(ints, intents, ents, trans)
         print(res)
