@@ -126,8 +126,8 @@ class ChatApplication:
 
         self.input_entry.delete(0, END)
         msg1 = f"{msg}"
-        ints, trans=self.chat.predict_class(msg)
-        msg2 = f"{self.chat.get_response(ints, INTENTS, find_NER(msg), trans)}"
+        ints, trans, defs=self.chat.predict_class(msg)
+        msg2 = f"{self.chat.get_response(ints, INTENTS, find_NER(msg), trans, defs)}"
         if not DIAL_TAG:
             y_coord_1 = 0
         else:
