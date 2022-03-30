@@ -48,7 +48,7 @@ The file `wiki.py` identifies the word a user wants a definition for, finds the 
     
    ![Wikipedia definition snippet](documentation/snippets/wiki_example.png)
 
-
+### *Old features*:
 ### Named Entity recognition using Spacy
 The file `NER_func.py` analyzes the raw user text and identifies named entities in it (For example UBCO and Commons are named entities). We then use this function in `chatbot.py`. If there were named entities in the message the bot will provide the information user requested for a given entity. For example, the bot can provide the information on the opening hours of the Commons.
 
