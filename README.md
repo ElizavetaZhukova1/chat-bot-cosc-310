@@ -33,6 +33,21 @@ This ensures the mock files are located correctly by Python.
 Run `python chatbot_run.py` to start the application.
 
 ## The list of features
+### *Newly added features (individual project)*:
+### Translation using googletrans (Google translate API)
+The file `translator.py` translates the user's text to english, identifies the language the user used and translates bot's response into user's language. This class is used in `chatbot.py` to translate user's message, generate bot's response to translated message and then if user's language is not english translate bot's response to user's language. If user's language is not English the bot's final response consists of the translated and untranslated version of the response.
+ 
+   **Snippet:**
+    
+   ![Google Translate snippet](documentation/snippets/translate_example.png)
+
+### Providing definitions from Wikipedia (Wikipedia API)
+The file `wiki.py` identifies the word a user wants a definition for, finds the according article on Wikipedia and returns the summary of the Wikipedia article. This class is used in `chatbot.py` then user's intent is identified as "definition" the program will find out which word the user wants defined and provide a 3 sentence definition from Wikipedia.
+
+   **Snippet:**
+    
+   ![Wikipedia definition snippet](documentation/snippets/wiki_example.png)
+
 
 ### Named Entity recognition using Spacy
 The file `NER_func.py` analyzes the raw user text and identifies named entities in it (For example UBCO and Commons are named entities). We then use this function in `chatbot.py`. If there were named entities in the message the bot will provide the information user requested for a given entity. For example, the bot can provide the information on the opening hours of the Commons.

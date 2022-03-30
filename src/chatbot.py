@@ -107,7 +107,6 @@ class Chat:
         if not intents_list:
             result = random.choice(APOLOGIES)
         tag = intents_list[0]['intent']
-        print(tag)
 
         if tag in ["opening hours", "more information", "location info", "contact info"]:
             ent_matches = []

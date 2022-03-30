@@ -11,6 +11,8 @@ keras = "*"
 pillow = "*"
 spacy = "*"
 symspellpy = "*"
+googletrans = "*"
+wikipedia = "*"
 
 [dev-packages]
 pylint = "*"
